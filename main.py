@@ -2,9 +2,13 @@ from flask import Flask, request, redirect
 import datetime
 from replit import db
 import os
+from groq import Groq
+
 
 app = Flask(__name__, static_url_path='/static')
 Yeid = os.environ['Yeid']
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
+
 
 
 def getChat(isAdmin):
@@ -16,14 +20,17 @@ def getChat(isAdmin):
   keys = list(keys)
   result = ""
   recent = 0
-  for key in reversed(keys):
+  for key in keys:
     myMessage = message
     myMessage = myMessage.replace("{username}", db[key]["username"])
     myMessage = myMessage.replace("{timestamp}", key)
-    myMessage = myMessage.replace("{message}", db[key]["message"])
+    myMessage = myMessage.replace("{message}", db[key]["urmessage"])
+    
+    myMessage = myMessage.replace("{answer}", db[key]["Airesponse"])
+
 
     if isAdmin == Yeid:
-      myMessage = myMessage.replace("{admin}", f"""<a href="/delete?id={key}"> ❌</a>""")
+      myMessage = myMessage.replace("{admin}", f"""<a href="/delete?id={key}"><img src="/static/images/delete.png" style="width: 15px; height: 15px;"> </a>""")
     else:
       myMessage = myMessage.replace("{admin}", "")
 
@@ -47,15 +54,29 @@ def index():
 @app.route('/add', methods=["POST"])
 def add():
   form = request.form
-  message = form["message"]
+  urmessage = form["message"]
   date = datetime.datetime.now()
   timestamp = datetime.datetime.timestamp(date)
+  prompt = (f"Answer the {urmessage} like wizard, but be as short as possible. Answer in the same language the user is using. Your answer must be under 50 words")
+  response = client.chat.completions.create(
+      messages=[
+          {
+              "role": "user",
+              "content": prompt,
+          }
+      ],
+      model="llama3-8b-8192",
+  )
+
+  Airesponse = response.choices[0].message.content
   userid = request.headers["X-Replit-User-Id"]
   username = request.headers["X-Replit-User-Name"]
   db[datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")] = {
     "username": username,
-    "message": request.form['message']
+    "urmessage": request.form['message'],
+    "Airesponse" : Airesponse
   }
+
   print(userid)
   #page = f"""{userid} {username} {timestamp} {message}"""
   return redirect("/")
@@ -68,7 +89,6 @@ def delete():
   results = request.values["id"]
   del db[results]
   return redirect("/")
-
 
 if __name__ == '__main__':
   app.run(debug=True)
