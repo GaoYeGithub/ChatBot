@@ -8,7 +8,7 @@
     <div class="container">
         <img src="static/images/wizard.png" alt="Wizard" class="icon">
         <img src="static/images/user.png" alt="User" class="icon">
-        <h1>Community Chat</h1>
+        <h1>Role Playing Game</h1>
         <h2>You are logged in as {username}</h2>
         <hr>
         <div class="chats">
@@ -18,6 +18,12 @@
 
         <form method="post" action="/add">
             <p>Message: <input type="text" name="message" required></p>
+            <select name="personality" id="ai">
+              <option value="Wizard">Wizard</option>
+              <option value="Monster">Monster</option>
+              <option value="Ally">Ally</option>
+              <option value="Doctor">Doctor</option>
+            </select>
             <button type="submit">Send</button>
         </form>
     </div>

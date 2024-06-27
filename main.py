@@ -25,7 +25,7 @@ def getChat(isAdmin):
     myMessage = myMessage.replace("{username}", db[key]["username"])
     myMessage = myMessage.replace("{timestamp}", key)
     myMessage = myMessage.replace("{message}", db[key]["urmessage"])
-    
+    myMessage = myMessage.replace("{type}", db[key]["AiType"])
     myMessage = myMessage.replace("{answer}", db[key]["Airesponse"])
 
 
@@ -57,7 +57,8 @@ def add():
   urmessage = form["message"]
   date = datetime.datetime.now()
   timestamp = datetime.datetime.timestamp(date)
-  prompt = (f"Answer the {urmessage} like wizard, but be as short as possible. Answer in the same language the user is using. Your answer must be under 50 words")
+  personality = form["personality"]
+  prompt = (f"You are roleplaying as {personality} and the player said this {urmessage}, but be as short as possible. Answer in the same language the user is using. Your answer must be under 50 words")
   response = client.chat.completions.create(
       messages=[
           {
@@ -74,6 +75,7 @@ def add():
   db[datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")] = {
     "username": username,
     "urmessage": request.form['message'],
+    "AiType": personality,
     "Airesponse" : Airesponse
   }
 
