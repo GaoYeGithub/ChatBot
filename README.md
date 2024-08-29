@@ -1,3 +1,13 @@
+Fork and run the following Commands in termial or shell
+
+replace os.environ.get("GROQ_API_KEY") with your groq api key
+
+pip install poetry.lock
+python app.py
+
+Replace 
+
+
 # ChatBot
 I added chatbot to respond to messages, design a simple UI interface and added icon for delete stuff. It still look like a mess but by end I hope to make it look like discord. Still need to make a SQL or some other kind of data base order to deploy on netify or verifcy. PS. Does anyone know how to take replit profile pic?
 Fork and run main.py in replit put groq api key in replit serects
